@@ -1,5 +1,5 @@
 // background.js — PiVolve Auto Linker
-const JSON_URL = "https://yourusername.github.io/pivolve-auto-linker/data/keywords.json";
+const JSON_URL = "https://imtanjilsarkar.github.io/pivolve-auto-linker/data/keywords.json";
 const CACHE_KEY = "keywordData";
 
 async function fetchAndCacheKeywords() {

@@ -4,20 +4,14 @@
   "version": "1.0.0",
   "description": "Instantly understand CSE keywords — hover to see definitions, GeeksforGeeks links, and YouTube videos.",
   "author": "PiVolve By Tanjil Sarkar",
-  "homepage_url": "https://github.com/yourusername/pivolve-auto-linker",
-
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  },
+  "homepage_url": "https://github.com/imtanjilsarkar/pivolve-auto-linker",
 
   "permissions": [
     "storage"
   ],
 
   "host_permissions": [
-    "https://yourusername.github.io/*"
+    "https://imtanjilsarkar.github.io/*"
   ],
 
   "background": {
