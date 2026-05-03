@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-05-03",
+    "totalKeywords": 5
+  },
+  "keywords": {
+    "array": {
+      "gfg": "https://www.geeksforgeeks.org/array-data-structure/",
+      "yt": "https://www.youtube.com/watch?v=QJNwK2uJyGs",
+      "def": "A collection of elements identified by index or key."
+    },
+    "linked list": {
+      "gfg": "https://www.geeksforgeeks.org/data-structures/linked-list/",
+      "yt": "https://www.youtube.com/watch?v=R9PTBwOzceo",
+      "def": "A linear data structure where elements point to the next element."
+    },
+    "binary search": {
+      "gfg": "https://www.geeksforgeeks.org/binary-search/",
+      "yt": "https://www.youtube.com/watch?v=KsoUiMcvTVo",
+      "def": "Search algorithm that repeatedly divides sorted array in half."
+    },
+    "stack": {
+      "gfg": "https://www.geeksforgeeks.org/stack-data-structure/",
+      "yt": "",
+      "def": "LIFO data structure — elements added and removed from top."
+    },
+    "queue": {
+      "gfg": "https://www.geeksforgeeks.org/queue-data-structure/",
+      "yt": "",
+      "def": "FIFO data structure — elements added at rear, removed from front."
+    }
+  }
+}

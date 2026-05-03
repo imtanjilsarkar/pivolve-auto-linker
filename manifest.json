@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "PiVolve Auto Linker",
+  "version": "1.0.0",
+  "description": "Instantly understand CSE keywords — hover to see definitions, GeeksforGeeks links, and YouTube videos.",
+  "author": "PiVolve By Tanjil Sarkar",
+  "homepage_url": "https://github.com/yourusername/pivolve-auto-linker",
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "permissions": [
+    "storage"
+  ],
+
+  "host_permissions": [
+    "https://yourusername.github.io/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["content.css"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["popup/popup.html", "popup/popup.css", "popup/popup.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
