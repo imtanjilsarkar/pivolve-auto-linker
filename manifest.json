@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "PiVolve Auto Linker",
+  "short_name": "PiVolve",
   "version": "1.0.0",
   "description": "Instantly understand CSE keywords — hover to see definitions, GeeksforGeeks links, and YouTube videos.",
-  "author": "PiVolve By Tanjil Sarkar",
+  "author": "Tanjil Sarkar",
   "homepage_url": "https://github.com/imtanjilsarkar/pivolve-auto-linker",
 
   "icons": {
