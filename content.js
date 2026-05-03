@@ -1,52 +1,118 @@
-// content.js — PiVolve Auto Linker
+// content.js — PiVolve Auto Linker (Pro Edition)
 (function () {
   "use strict";
 
   let keywordData = {};
   let isPopupVisible = false;
   let popupElement = null;
+  let isExtensionEnabled = true;
+  let highlightedElements = [];
+  let toggleBtn = null;
 
-  // ——— Fetch keyword data from background ———
+  // ——— Init ———
   async function init() {
+    // Check if extension is disabled for this site
+    const siteKey = getSiteKey();
+    const result = await chrome.storage.local.get(siteKey);
+    isExtensionEnabled = result[siteKey] !== false; // Default: enabled
+
     try {
       const data = await chrome.runtime.sendMessage({ action: "getKeywords" });
       if (data && data.keywords) {
         keywordData = data.keywords;
-        scanAndHighlight();
+        if (isExtensionEnabled) {
+          scanAndHighlight();
+        }
       }
     } catch (error) {
       console.error("PiVolve: Failed to get keywords:", error);
     }
+
+    createToggleButton();
   }
 
-  // ——— Scan page text and wrap keywords ———
+  function getSiteKey() {
+    const hostname = window.location.hostname;
+    return `pivolve_disabled_${hostname}`;
+  }
+
+  // ——— Toggle Button ———
+  function createToggleButton() {
+    if (toggleBtn) return;
+
+    toggleBtn = document.createElement("button");
+    toggleBtn.id = "pivolve-toggle-btn";
+    toggleBtn.innerHTML = isExtensionEnabled ? "⚡" : "⏸️";
+    toggleBtn.setAttribute("data-tooltip", isExtensionEnabled ? "PiVolve On" : "PiVolve Off");
+    
+    if (!isExtensionEnabled) {
+      toggleBtn.classList.add("pivolve-disabled");
+    }
+
+    toggleBtn.addEventListener("click", toggleExtension);
+    document.body.appendChild(toggleBtn);
+  }
+
+  async function toggleExtension() {
+    isExtensionEnabled = !isExtensionEnabled;
+    const siteKey = getSiteKey();
+
+    // Save state
+    await chrome.storage.local.set({ [siteKey]: isExtensionEnabled });
+
+    // Update button
+    toggleBtn.innerHTML = isExtensionEnabled ? "⚡" : "⏸️";
+    toggleBtn.setAttribute("data-tooltip", isExtensionEnabled ? "PiVolve On" : "PiVolve Off");
+
+    if (isExtensionEnabled) {
+      toggleBtn.classList.remove("pivolve-disabled");
+      scanAndHighlight();
+    } else {
+      toggleBtn.classList.add("pivolve-disabled");
+      removeAllHighlights();
+    }
+  }
+
+  function removeAllHighlights() {
+    highlightedElements.forEach(span => {
+      if (span.parentNode) {
+        const textNode = document.createTextNode(span.textContent);
+        span.parentNode.replaceChild(textNode, span);
+      }
+    });
+    highlightedElements = [];
+    removePopup();
+  }
+
+  // ——— Scan and Highlight ———
   function scanAndHighlight() {
+    if (!isExtensionEnabled) return;
+
     const keywords = Object.keys(keywordData);
     if (keywords.length === 0) return;
 
-    // Build regex: match whole words, case-insensitive
     const escapedKeywords = keywords
-      .sort((a, b) => b.length - a.length) // longer first to avoid partial matches
+      .sort((a, b) => b.length - a.length)
       .map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
     const regex = new RegExp(`\\b(${escapedKeywords.join("|")})\\b`, "gi");
-
     walkTextNodes(document.body, regex);
   }
 
-  // ——— Traverse only text nodes (safe, doesn't break page) ———
   function walkTextNodes(node, regex) {
     if (node.nodeType === Node.TEXT_NODE) {
       const parent = node.parentNode;
 
-      // Skip if inside our own popup or already processed
       if (
         parent.closest("#pivolve-popup") ||
+        parent.closest("#pivolve-toggle-btn") ||
         parent.closest(".pivolve-highlight") ||
         parent.closest("script") ||
         parent.closest("style") ||
         parent.closest("textarea") ||
-        parent.closest("input")
+        parent.closest("input") ||
+        parent.closest("pre") ||
+        parent.closest("code")
       ) {
         return;
       }
@@ -59,30 +125,25 @@
       node.nodeType === Node.ELEMENT_NODE &&
       node.childNodes.length > 0
     ) {
-      // Recursively walk children
       Array.from(node.childNodes).forEach(child => walkTextNodes(child, regex));
     }
   }
 
-  // ——— Replace text node with highlighted spans ———
   function replaceTextNode(textNode, regex) {
     const text = textNode.textContent;
     const fragment = document.createDocumentFragment();
     let lastIndex = 0;
     let match;
 
-    // Reset regex (since we reuse it)
     regex.lastIndex = 0;
 
     while ((match = regex.exec(text)) !== null) {
-      // Text before match
       if (match.index > lastIndex) {
         fragment.appendChild(
           document.createTextNode(text.slice(lastIndex, match.index))
         );
       }
 
-      // Highlighted keyword
       const matchedWord = match[0];
       const lowerWord = matchedWord.toLowerCase();
       const data = keywordData[lowerWord];
@@ -96,11 +157,11 @@
         span.dataset.yt = data.yt || "";
         span.dataset.def = data.def || "";
 
-        // Event listeners
         span.addEventListener("mouseenter", showPopup);
         span.addEventListener("mouseleave", schedulePopupHide);
 
         fragment.appendChild(span);
+        highlightedElements.push(span);
       } else {
         fragment.appendChild(document.createTextNode(matchedWord));
       }
@@ -108,7 +169,6 @@
       lastIndex = regex.lastIndex;
     }
 
-    // Remaining text after last match
     if (lastIndex < text.length) {
       fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
     }
@@ -116,24 +176,24 @@
     textNode.parentNode.replaceChild(fragment, textNode);
   }
 
-  // ——— Show popup near highlighted word ———
+  // ——— Popup ———
   function showPopup(event) {
+    if (!isExtensionEnabled) return;
+
     const span = event.currentTarget;
     const keyword = span.dataset.keyword;
     const def = span.dataset.def;
     const gfg = span.dataset.gfg;
     const yt = span.dataset.yt;
 
-    // Remove any existing popup
     removePopup();
 
-    // Create popup
     popupElement = document.createElement("div");
     popupElement.id = "pivolve-popup";
     popupElement.innerHTML = `
       <div class="pivolve-popup-header">
         <strong>${keyword}</strong>
-        <button class="pivolve-popup-close">&times;</button>
+        <button class="pivolve-popup-close">×</button>
       </div>
       ${def ? `<p class="pivolve-popup-def">${def}</p>` : ""}
       <div class="pivolve-popup-links">
@@ -152,17 +212,18 @@
             : ""
         }
       </div>
+      <div class="pivolve-brand">
+        Powered by <span>PiVolve</span>
+      </div>
     `;
 
     document.body.appendChild(popupElement);
-
-    // Position near the word
     positionPopup(span);
 
-    // Add close button listener
-    popupElement.querySelector(".pivolve-popup-close").addEventListener("click", removePopup);
+    popupElement.querySelector(".pivolve-popup-close").addEventListener("click", () => {
+      animateAndRemovePopup();
+    });
 
-    // Keep popup alive when hovering over it
     popupElement.addEventListener("mouseenter", () => {
       isPopupVisible = true;
     });
@@ -171,42 +232,43 @@
     isPopupVisible = true;
   }
 
-  // ——— Position popup near target element ———
   function positionPopup(target) {
     if (!popupElement) return;
 
     const rect = target.getBoundingClientRect();
     const popupWidth = 320;
-    const popupHeight = popupElement.offsetHeight || 150;
-
-    let top = rect.top + window.scrollY - popupHeight - 10; // Above the word
+    let top = rect.top + window.scrollY - (popupElement.offsetHeight || 180) - 10;
     let left = rect.left + window.scrollX;
 
-    // If not enough space above, show below
     if (top < window.scrollY + 10) {
       top = rect.bottom + window.scrollY + 10;
     }
 
-    // Prevent overflow on right side
     if (left + popupWidth > window.innerWidth) {
       left = window.innerWidth - popupWidth - 20;
     }
-
-    // Prevent overflow on left side
     if (left < 10) left = 10;
 
     popupElement.style.top = `${top}px`;
     popupElement.style.left = `${left}px`;
   }
 
-  // ——— Schedule popup removal (small delay for UX) ———
   function schedulePopupHide() {
     isPopupVisible = false;
     setTimeout(() => {
-      if (!isPopupVisible) {
-        removePopup();
+      if (!isPopupVisible && popupElement) {
+        animateAndRemovePopup();
       }
-    }, 300); // 300ms grace period
+    }, 300);
+  }
+
+  function animateAndRemovePopup() {
+    if (popupElement) {
+      popupElement.classList.add("pivolve-popup-removing");
+      popupElement.addEventListener("animationend", () => {
+        removePopup();
+      }, { once: true });
+    }
   }
 
   function removePopup() {
@@ -218,5 +280,9 @@
   }
 
   // ——— Start ———
-  init();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();

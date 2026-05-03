@@ -1,47 +1,75 @@
-/* content.css — PiVolve Auto Linker (Pro Edition) */
+/* ============================================
+   PiVolve Auto Linker — Pro Edition CSS
+   ============================================ */
 
 /* ——— Highlighted Keywords (Invisible Mode) ——— */
 .pivolve-highlight {
-  /* Looks like normal text */
   background: transparent;
   border-bottom: 1.5px solid transparent;
   cursor: help;
-  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
-  padding: 0 2px;
-  border-radius: 3px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0 3px;
+  border-radius: 4px;
+  position: relative;
 }
 
-/* Only on hover — subtle reveal */
+.pivolve-highlight::before {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
 .pivolve-highlight:hover {
-  background: #eff6ff;
-  border-bottom-color: #60a5fa;
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
   color: #1e3a5f;
+  border-bottom-color: transparent;
 }
 
-/* ——— Popup Container (Glassmorphism Style) ——— */
+.pivolve-highlight:hover::before {
+  width: 100%;
+}
+
+/* ——— Popup Container (Pro Glassmorphism) ——— */
 #pivolve-popup {
   position: absolute;
   z-index: 2147483647;
-  width: 300px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  width: 320px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.04),
+    0 10px 25px rgba(0, 0, 0, 0.08),
+    0 20px 50px rgba(0, 0, 0, 0.12),
+    0 0 0 0.5px rgba(0, 0, 0, 0.05) inset;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   font-size: 13px;
   line-height: 1.5;
   color: #1e293b;
   overflow: hidden;
-  animation: pivolve-slide-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: pivolve-popup-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top left;
   pointer-events: auto;
+  user-select: none;
 }
 
-@keyframes pivolve-slide-up {
+#pivolve-popup.pivolve-popup-removing {
+  animation: pivolve-popup-out 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes pivolve-popup-in {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.97);
+    transform: translateY(12px) scale(0.94);
   }
   to {
     opacity: 1;
@@ -49,154 +77,283 @@
   }
 }
 
+@keyframes pivolve-popup-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+}
+
 /* ——— Popup Header ——— */
-.pivolve-popup-header {
+#pivolve-popup .pivolve-popup-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px 0;
+  padding: 16px 18px 0;
 }
 
-.pivolve-popup-header strong {
+#pivolve-popup .pivolve-popup-header strong {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: #0f172a;
   text-transform: capitalize;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #1e293b, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.pivolve-popup-close {
-  background: none;
+#pivolve-popup .pivolve-popup-close {
+  background: rgba(0, 0, 0, 0.04);
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   color: #94a3b8;
   cursor: pointer;
-  padding: 2px 6px;
-  line-height: 1;
-  border-radius: 6px;
-  transition: all 0.15s;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
-.pivolve-popup-close:hover {
+#pivolve-popup .pivolve-popup-close:hover {
+  background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
-  background: #fef2f2;
+  transform: rotate(90deg);
 }
 
 /* ——— Definition ——— */
-.pivolve-popup-def {
+#pivolve-popup .pivolve-popup-def {
   margin: 0;
-  padding: 8px 16px 14px;
+  padding: 10px 18px 16px;
   color: #64748b;
   font-size: 12.5px;
   border-bottom: 1px solid #f1f5f9;
+  line-height: 1.6;
 }
 
 /* ——— Links Section ——— */
-.pivolve-popup-links {
-  padding: 10px 12px 14px;
+#pivolve-popup .pivolve-popup-links {
+  padding: 12px 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
-.pivolve-link {
+#pivolve-popup .pivolve-link {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 10px;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
   text-decoration: none;
-  font-size: 12.5px;
-  font-weight: 500;
-  transition: all 0.18s ease;
+  font-size: 13px;
+  font-weight: 600;
   letter-spacing: -0.01em;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.pivolve-link:hover {
-  transform: translateX(2px);
+#pivolve-popup .pivolve-link::after {
+  content: "→";
+  position: absolute;
+  right: 16px;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all 0.2s ease;
+}
+
+#pivolve-popup .pivolve-link:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+#pivolve-popup .pivolve-link:hover {
+  transform: translateX(3px);
+  padding-right: 40px;
 }
 
 /* ——— GFG Link ——— */
-.pivolve-gfg {
-  background: #f0fdf4;
+#pivolve-popup .pivolve-gfg {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
   color: #15803d;
   border: 1px solid #bbf7d0;
 }
 
-.pivolve-gfg:hover {
-  background: #dcfce7;
+#pivolve-popup .pivolve-gfg:hover {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
   border-color: #86efac;
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.12);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.15);
 }
 
 /* ——— YouTube Link ——— */
-.pivolve-yt {
-  background: #fef2f2;
+#pivolve-popup .pivolve-yt {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
   color: #b91c1c;
   border: 1px solid #fecaca;
 }
 
-.pivolve-yt:hover {
-  background: #fee2e2;
+#pivolve-popup .pivolve-yt:hover {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
   border-color: #fca5a5;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.12);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.15);
 }
 
-/* ——— Brand Badge (Subtle PiVolve mark) ——— */
-.pivolve-popup-links::after {
-  content: "⚡ PiVolve";
-  display: block;
-  text-align: right;
+/* ——— PiVolve Brand Badge ——— */
+#pivolve-popup .pivolve-brand {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 0 18px 14px;
   font-size: 10px;
   color: #94a3b8;
-  margin-top: 6px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
 }
 
-/* ——— Respects Dark Mode ——— */
+#pivolve-popup .pivolve-brand span {
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ——— Toggle Switch (Floating) ——— */
+#pivolve-toggle-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483646;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: pivolve-float-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#pivolve-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+#pivolve-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+#pivolve-toggle-btn.pivolve-disabled {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  opacity: 0.7;
+}
+
+#pivolve-toggle-btn.pivolve-disabled:hover {
+  opacity: 1;
+}
+
+@keyframes pivolve-float-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ——— Toggle Tooltip ——— */
+#pivolve-toggle-btn::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: 60px;
+  background: #1e293b;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+#pivolve-toggle-btn:hover::before {
+  opacity: 1;
+}
+
+/* ——— Dark Mode ——— */
 @media (prefers-color-scheme: dark) {
   #pivolve-popup {
     background: rgba(30, 41, 59, 0.94);
-    border-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
     color: #e2e8f0;
+    box-shadow:
+      0 4px 6px rgba(0, 0, 0, 0.2),
+      0 10px 25px rgba(0, 0, 0, 0.3),
+      0 20px 50px rgba(0, 0, 0, 0.4);
   }
 
-  .pivolve-popup-header strong {
-    color: #f1f5f9;
+  #pivolve-popup .pivolve-popup-header strong {
+    background: linear-gradient(135deg, #e2e8f0, #60a5fa);
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 
-  .pivolve-popup-def {
+  #pivolve-popup .pivolve-popup-def {
     color: #94a3b8;
     border-bottom-color: #334155;
   }
 
-  .pivolve-gfg {
+  #pivolve-popup .pivolve-gfg {
     background: rgba(34, 197, 94, 0.1);
     color: #86efac;
     border-color: rgba(34, 197, 94, 0.2);
   }
 
-  .pivolve-gfg:hover {
+  #pivolve-popup .pivolve-gfg:hover {
     background: rgba(34, 197, 94, 0.18);
+    border-color: rgba(34, 197, 94, 0.3);
   }
 
-  .pivolve-yt {
+  #pivolve-popup .pivolve-yt {
     background: rgba(239, 68, 68, 0.1);
     color: #fca5a5;
     border-color: rgba(239, 68, 68, 0.2);
   }
 
-  .pivolve-yt:hover {
+  #pivolve-popup .pivolve-yt:hover {
     background: rgba(239, 68, 68, 0.18);
+    border-color: rgba(239, 68, 68, 0.3);
   }
 
   .pivolve-highlight:hover {
-    background: rgba(96, 165, 250, 0.15);
-    border-bottom-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.12);
     color: #bfdbfe;
   }
 
-  .pivolve-highlight {
-    border-bottom-color: transparent;
+  #pivolve-toggle-btn {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   }
 }
