@@ -33,7 +33,7 @@
 
 ##  Features
 
--  **60+ CSE Keywords** — Data Structures, Algorithms, OOP, DBMS, OS, Programming Concepts
+-  **125+ CSE Keywords** — Data Structures, Algorithms, OOP, DBMS, OS, Programming Concepts
 -  **Hover to Reveal** — Keywords stay invisible until you need them
 -  **Clean Glassmorphism Popup** — Smooth animations, no visual clutter
 -  **One-Click Links** — GeeksforGeeks article + YouTube video for every keyword
